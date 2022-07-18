@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!--///// 1 st ////////-->
+
+    <service verb="get" noun="FemalePersons">
+
+    <out-parameters>
+        <parameter name="personsList" type="List"/>
+    </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.party.Person" list="personsList">
+                <econdition field-name="gender" value="F"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <!--///// 2 nd ////////-->
+
+    <service verb="get" noun="Persons">
+
+        <out-parameters>
+            <parameter name="personsList" type="List"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.party.Person" list="personsList">
+                <econdition field-name="maritalStatusEnumId" value="MarsMarried"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <!--///// 3rd ////////-->
+
+    <service verb="get" noun="LatestOrders">
+
+        <out-parameters>
+            <parameter name="ordersList" type="List"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.order.OrderHeader" list="ordersList">
+                <order-by field-name="-placedDate"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <!--///// 4 th  ////////-->
+
+    <service verb="get" noun="Order">
+
+        <in-parameters>
+            <parameter name="orderId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderDetails" type="List"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.order.OrderHeader" list="orderDetails">
+                <econdition field-name="orderId" />
+            </entity-find>
+        </actions>
+    </service>
+
+    <!--///// 5 th  ////////-->
+
+    <service verb="get" noun="OrderHeaders">
+        <out-parameters>
+            <parameter name="orderHeaderDetails" type="List"/>
+        </out-parameters>
+
+        <actions>
+
+            <entity-find entity-name="mantle.order.OrderHeader" list="orderHeaderDetails">
+                <econdition field-name="grandTotal" operator="greater"  value="50"></econdition>
+            </entity-find>
+
+        </actions>
+    </service>
+
+    <!--///// 6 th  ////////-->
+
+    <service verb="get" noun="OrderItems">
+        <out-parameters>
+            <parameter name="orderItemDetails" type="List"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.order.OrderPart" list="orderItemDetails">
+                <econdition field-name="orderPartSeqId" value="01"/>
+                <econdition field-name="orderId" value="100102"/>
+            </entity-find>
+
+        </actions>
+    </service>
+
+    <!--///// 7 th  ////////-->
+
+    <service verb="get" noun="OrderParts">
+        <out-parameters>
+            <parameter name="orderPartDetails" type="List"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.order.OrderPart" list="orderPartDetails">
+                <econdition field-name="partTotal" operator="less-equals" from="20" />
+            </entity-find>
+        </actions>
+    </service>
+
+    <!--///// 8 th  ////////-->
+    
+    
+    <service verb="get" noun="OrderPartData">
+        <out-parameters>
+            <parameter name="orderPartDetails" type="List"/>
+<!--            <parameter name="orderId" type="Integer"/>-->
+<!--            <parameter name="orderPartSeqId" type="Integer"/>-->
+<!--            <parameter name="facilityId" type="Integer"/>-->
+<!--            <parameter name="partName"/>-->
+<!--            <parameter name="customerPartyId" type="Integer"/>-->
+        </out-parameters>
+        <actions>
+<entity-find entity-name="mantle.order.OrderPart" list="orderPartDetails1">
+    <econdition field-name="facilityId" value="ZIRET_WH"/>
+</entity-find>
+            <set field="orderPartDetails" from="[]"/>
+            <iterate list="orderPartDetails1" entry="orderPart">
+
+
+                <set field="orderId" from="orderPart.orderId"/>
+                <set field="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+                <set field="facilityId" from="orderPart.facilityId"/>
+                <set field="partName" from="orderPart.partName"/>
+<!--                <log message="============${partName}=============="/>-->
+                <set field="customerPartyId" from="orderPart.customerPartyId"/>
+
+
+
+
+            <set field="orderPartDetails" from="orderPartDetails+[orderId:orderId, orderPartSeqId:orderPartSeqId,
+
+                                facilityId:facilityId, partName:partName]"/>
+            </iterate>
+
+        </actions>
+    </service>
+
+    <!--///// 9 th  ////////-->
+
+    <service verb="get" noun="OrderPartsCount">
+        <out-parameters>
+            <parameter name="orderPartsCount"/>
+        </out-parameters>
+        <actions>
+
+            <entity-find-count entity-name="mantle.order.OrderPart" count-field="orderPartsCount">
+                <econdition field-name="customerPartyId" value="CustJqp"/></entity-find-count>
+        </actions>
+    </service>
+
+    <!--///// 10 th  ////////-->
+
+    <service verb="get" noun="OrderPartsInfo">
+        <out-parameters>
+            <parameter name="orderPartsList" type="List"/>
+        </out-parameters>
+        <actions>
+
+           <entity-find entity-name="mantle.order.OrderPart" list="orderPartsList" distinct="true">
+            <econdition field-name="shipmentMethodEnumId" value="ShMthNextDay"/>
+<!--   Instid of using ShtMthGround i used ShMthNextDay Because There is no data present according  to the check in table -->
+            <econdition field-name="facilityId" value="ZIRET_WH"/>
+
+            </entity-find>
+        </actions>
+    </service>
+
+
+</services>
