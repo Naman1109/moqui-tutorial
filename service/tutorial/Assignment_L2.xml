@@ -132,15 +132,17 @@
             <set field="orders" from="[]"/>
             <set field="orderMap" from="[:]"/>
             <iterate list="orderHeaderList" entry="orderHeader">
+
                 <set field="currentOrderId" from="orderHeader.orderId"/>
 
                 <set field="orderMap" from="[orderId:orderHeader.orderId,orderName:orderHeader.orderName,currencyUom:orderHeader.currencyUom,salesChannelEnumId:orderHeader.salesChannelEnumId,
                             statusId:orderHeader.statusId,placedDate:orderHeader.placedDate,grandTotal:orderHeader.grandTotal]"/>
-
+                <log message="===============orderMap========${orderMap}"/>
 
                 <entity-find entity-name="OrderPart" list="orderPartList">
-                    <econdition field-name="orderId" operator="equals" from="currentOrderId"/>
+                    <econdition field-name="orderId" from="currentOrderId"/>
                 </entity-find>
+                <log message="=========orderId=========${orderId}============"/>
 
                 <iterate list="orderPartList" entry="orderPart">
                     <set field="order_parts" from="[]"/>
@@ -176,7 +178,7 @@
                     <set field="orderItm_Map" from="[orderItemSeqId:orderItem.orderItemSeqId,productId:orderItem.productId,itemDescription:orderItem.itemDescription,
                                              quantity:orderItem.quantity,unitAmount:orderItem.unitAmount]"/>
                     <script>item_details.add(orderItm_Map)</script>
-                    <!--                    <log message="===============item_details=============${item_details}"/>-->
+                    <log message="===============item_details=============${item_details}"/>
                     <!--                    <log message="===============orderItemList=============${orderItemList}"/>-->
                 </iterate>
 
