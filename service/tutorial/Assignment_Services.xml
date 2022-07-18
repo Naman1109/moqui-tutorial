@@ -70,7 +70,7 @@
         <actions>
 
             <entity-find entity-name="mantle.order.OrderHeader" list="orderHeaderDetails">
-                <econdition field-name="grandTotal" operator="greater"  from="50"></econdition>
+                <econdition field-name="grandTotal" operator="greater"  value="50"></econdition>
             </entity-find>
 
         </actions>
