@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+    <service verb="poll" noun="DemoUser" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="systemMessageTypeId" required="true"/>
+            <parameter name="systemMessageRemoteId" required="true"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="moqui.service.message.SystemMessageType" value-field="systemMessageType"/>
+            <entity-find-one entity-name="moqui.service.message.SystemMessageRemote" value-field="systemMessageRemote"/>
+
+<!--            <log message="==============systemMessageType.sendPath==============${systemMessageType.sendPath}==============="/>-->
+            <log message="==============systemMessageRemote.sendUrl==============${systemMessageRemote.sendUrl}${systemMessageType.sendPath}==============="/>
+            <script>
+                <![CDATA[
+             import org.moqui.util.RestClient
+             String endpoint = systemMessageType.sendPath;
+             String sendUrl = systemMessageRemote.sendUrl;
+             println(sendUrl+endpoint)
+             RestClient restClient = ec.service.rest();
+             restClient.contentType("application/json")
+             restClient.method("GET");
+             restClient.uri(sendUrl+endpoint);
+             RestClient.RestResponse restResponse = restClient.call();
+             String responseText = restResponse.text();
+                Map<String, Object> result = ec.service.sync().name("org.moqui.impl.SystemMessageServices.receive#IncomingSystemMessage")
+                    .parameter("systemMessageTypeId", systemMessageType.systemMessageTypeId)
+                    .parameter("systemMessageRemoteId", systemMessageRemote.systemMessageRemoteId)
+                    .parameter("messageText",responseText).disableAuthz()
+                    .requireNewTransaction(true).call()
+
+            ]]></script>
+        </actions>
+    </service>
+
+    <service verb="consume" noun="DemoUserMessage" authenticate="anonymous-all" transaction-timeout="1800">
+        <implements service="org.moqui.impl.SystemMessageServices.consume#SystemMessage"/>
+        <actions>
+            <entity-find-one entity-name="moqui.service.message.SystemMessage" value-field="systemMessage"/>
+            <log message="================systemMessage===================${systemMessage}================="/>
+            <set field="apiResponse" from="new groovy.json.JsonSlurper().parseText(systemMessage.messageText)"/>
+            <service-call name="mantle.party.PartyServices.create#Person"
+                          in-map="[pseudoId:apiResponse.id,firstName:apiResponse.name,lastName:apiResponse.gender]" out-map="context"/>
+        </actions>
+    </service>
+</services>
