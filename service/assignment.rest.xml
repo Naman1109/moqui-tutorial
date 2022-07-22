@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-2.1.xsd"
+          name="tutorial" displayName="Assignment_L2 REST API" version="1.0">
+
+    <resource name="orders" require-authentication="anonymous-all">
+        <method type="post"><service name="tutorial.Assignment_L2.post#Orders"/></method>
+        <method type="get"><service name="tutorial.Assignment_L2.get#AllOrder"/></method>
+        <id name="orderId">
+            <method type="get"><service name="tutorial.Assignment_L2.get#OrderDetails"/></method>
+                <method type="put"><service name="tutorial.Assignment_L2.store#UpdateOrder"/></method>
+        </id>
+        <resource name="orderItems" require-authentication="anonymous-all">
+            <method type="post"><service name="tutorial.Assignment_L2.post#OrderEntity"/></method>
+        </resource>
+    </resource>
+</resource>
